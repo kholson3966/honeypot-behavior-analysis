@@ -1,68 +1,47 @@
-Honeypot Behavior Analysis Script
-This script parses data from a honeypot that collects DShield data, Cowrie logs, and tcpdump captures. The analysis is part of a SANS University undergraduate program (internship BACS4499).
 
-Objective:
-Determine whether a recorded honeypot session was initiated by a human or a non-human. This script performs the initial data aggregation toward that goal.
+# Honeypot Session Analysis
 
-Usage
-The script (honeypot_behavior_analysis.py) consumes all available raw data sources (PCAP capturing is scripted) and generates the following outputs:
+I wrote this script to parse data from a honeypot. The honeypot is collecting Dshield data, Cowrie data and tcpdump captures.
 
-Cowrie NDJSON session parsing, reporting per-session:
+The honeypot analysis is a requirement for my SANS University undergraduate program and specifically the internship BACS4499.
 
-Event count
+The point of this exercise is to get a sense of whether a recorded honeypot session is initiated by a human or a non-human. This script is the first data aggregation step to that end goal.
 
-Login count
+## How to Use
 
-Command count
+To use this file: `honeypot_behavior_analysis.py` consumes all available raw data sources (capturing pcap files is scripted) and generates the following information:
 
-Unique commands
+- Parses Cowrie NDJSON by session and computes:
+  - counts of events
+  - logins
+  - commands
+  - unique commands
+  - inter-command timing (mean/median/std)
+  - reported session duration
+  - downloads and client version
+  - Applies a simple scoring to label sessions (human vs scripted)
+- Parses dshield logs into structured records, summarizes scan scatter.
+- Optionally shells out to tshark to compute handshake completion per source.
+- Correlates dshield hits that occur within each Cowrie session window (±3s).
+- Pulls unique IPs from Cowrie sessions, dshield per-source, and pcap per-source summaries.
+- Looks them up via MaxMind (Country/City/Insights) using your account ID + license key.
+- Caches results to JSON so repeated runs don’t re-bill the same IPs.
 
-Inter-command timing (mean/median/std)
+## Output Files
 
-Reported session duration
+- `sessions_scored.csv`
+- `dshield_scanners.csv`
+- `ip_geo.csv` (one row per IP enriched)
+- `dshield_top_ports.csv`
+- `uniq_sessions.csv`
 
-Downloads and client version
+## Notes
 
-Simple scoring for session labeling (human vs scripted)
+If you omit `--mm-account-id` or `--mm-license-key`, the script skips GeoIP gracefully.
 
-DShield log parsing:
+Use `--mm-service insights` for richer traits if your plan allows.
 
-Converts into structured records
+Add `--mm-pause 0.1` to throttle requests if you like.
 
-Summarizes scan scatter
+PCAP parsing is optional; install tshark and set `--tshark` or ensure it’s on PATH.
 
-Optional PCAP analysis:
-
-Shells out to tshark to compute handshake completion per source
-
-Correlation:
-
-Matches DShield hits that occur within ±3 seconds of a Cowrie session window
-
-IP enrichment:
-
-Gathers unique IPs from Cowrie sessions, DShield summaries, and PCAP summaries
-
-Performs MaxMind lookups (Country/City/Insights) using your account ID and license key
-
-Caches results in JSON to avoid repeated lookups and charges
-
-Output Files
-sessions_scored.csv
-
-dshield_scanners.csv
-
-ip_geo.csv (one row per enriched IP)
-
-dshield_top_ports.csv
-
-uniq_sessions.csv
-
-Notes
-If you omit --mm-account-id or --mm-license-key, GeoIP lookup is skipped gracefully.
-
-Use --mm-service insights for richer traits, if your MaxMind plan allows.
-
-Add --mm-pause 0.1 to throttle API requests.
-
-PCAP parsing is optional; install tshark and set --tshark or ensure it’s in your PATH.
