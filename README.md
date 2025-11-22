@@ -1,7 +1,11 @@
 # honeypot-behavior-analysis
-This script exists to parse data from a honeypot. The honeypot is collecting Dshield data, Cowrie data and tcpdump captures. The honeypot analysis is a requirement for my SANS University ungraduate program and specifically the internship BACS4499.
-The end goal of the project is to get a sense of whether a recorded honeypot session is initiated by a human or a non-human.
+I wrote this script to parse data from a honeypot. The honeypot is collecting Dshield data, Cowrie data and tcpdump captures.
 
+The honeypot analysis is a requirement for my SANS University ungraduate program and specifically the internship BACS4499.
+
+The point of this exercise is to get a sense of whether a recorded honeypot session is initiated by a human or a non-human. Thius script is the first data aggregation step to that end goal.
+
+To use this file:
 honeypot_behavior_analysis.py consumes all available raw data sources (capturing pcap files is scripted) and generates the following information:
 	• Parses Cowrie NDJSON by session and computes:
 		○ counts of events, logins, commands, unique commands
